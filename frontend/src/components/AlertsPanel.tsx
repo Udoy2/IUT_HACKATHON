@@ -44,7 +44,7 @@ export function AlertsPanel({ alerts }: Props) {
               {active.slice(0, 12).map((a) => (
                 <AlertBox variant="alert" key={a.id}>
                   <span style={{ color: "var(--rose)", fontWeight: 600, fontSize: 11, letterSpacing: "0.12em", minWidth: 26 }}>
-                    {a.type === "after_hours" ? "AH" : "RS"}
+                    {a.type === "after_hours" ? "" : ""}
                   </span>
                   <div style={{ flex: 1 }}>
                     <AlertTitle>
