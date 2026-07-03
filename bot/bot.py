@@ -53,19 +53,19 @@ def humanize(prompt: str, fallback: str) -> str:
         return fallback
     try:
         response = groq_client.chat.completions.create(
-            model="llama3-8b-8192",
+            model="openai/gpt-oss-20b",
             messages=[
                 {
                     "role": "system",
                     "content": (
                         "You are a friendly office assistant bot. "
                         "Summarize the given raw device status data into one or two clear, "
-                        "friendly sentences. Keep it concise. Use emojis sparingly."
+                        "friendly sentences. Keep it concise. Use emojis sparingly. Be charismatic and make jokes"
                     ),
                 },
                 {"role": "user", "content": prompt},
             ],
-            max_tokens=200,
+            max_tokens=400,
             temperature=0.7,
         )
         return response.choices[0].message.content.strip()
@@ -94,7 +94,7 @@ async def on_ready():
 
 @bot.command(name="ping")
 async def ping(ctx):
-    await ctx.send("🟢 Office Watch bot is online and connected to the backend!")
+    await ctx.send("🟢 Office Watch bot is online!")
 
 
 @bot.command(name="status")
