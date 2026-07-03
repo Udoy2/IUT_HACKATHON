@@ -1,139 +1,86 @@
-import { useEffect, useState } from "react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-} from "recharts";
 import type { Device, RoomKey } from "../types";
 import { ROOM_LABELS } from "../types";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "./ui/card";
 
 interface Props {
   devices: Record<string, Device>;
 }
 
-const ROOM_COLORS: Record<RoomKey, string> = {
-  drawing: "#6366f1",
-  work1: "#22d3ee",
-  work2: "#a78bfa",
-};
-
 const ROOMS: RoomKey[] = ["drawing", "work1", "work2"];
+const MAX_W = 18 * 65;
 
 export function PowerMeter({ devices }: Props) {
   const deviceList = Object.values(devices);
-
+  let totalW = 0;
   const perRoom: Record<RoomKey, number> = { drawing: 0, work1: 0, work2: 0 };
   for (const d of deviceList) {
-    if (d.status === "on") perRoom[d.room] += d.power_w;
-  }
-  const totalW = Object.values(perRoom).reduce((a, b) => a + b, 0);
-  const kwhToday = +(totalW * 12 * 0.5 / 1000).toFixed(3);
-
-  const chartData = ROOMS.map((r) => ({
-    name: ROOM_LABELS[r].replace(" Room", ""),
-    watts: +perRoom[r].toFixed(1),
-    room: r,
-  }));
-
-  // Animate total counter
-  const [displayed, setDisplayed] = useState(totalW);
-  useEffect(() => {
-    const step = (totalW - displayed) / 10;
-    if (Math.abs(step) < 0.5) {
-      setDisplayed(totalW);
-      return;
+    if (d.status === "on") {
+      perRoom[d.room] += d.power_w;
+      totalW += d.power_w;
     }
-    const t = setTimeout(() => setDisplayed((p) => p + step), 30);
-    return () => clearTimeout(t);
-  });
-
-  const maxW = 18 * 65; // theoretical max (all fans+lights on)
-  const fillPct = Math.min(100, (totalW / maxW) * 100);
+  }
+  const kwh = (totalW * 12 * 0.5 / 1000).toFixed(2);
+  // Render 412.0 as 412 + .0 in italic so the integer is the loud part
+  const [intPart, decPart] = totalW.toFixed(1).split(".");
 
   return (
-    <section className="panel" id="power-meter-panel">
-      <h2 className="panel-title">
-        <span className="panel-icon">⚡</span> Live Power Consumption
-      </h2>
-
-      <div className="power-hero">
-        <div className="power-arc-wrap">
-          <svg viewBox="0 0 200 120" className="power-arc-svg">
-            {/* background track */}
-            <path
-              d="M 10 110 A 90 90 0 0 1 190 110"
-              fill="none"
-              stroke="rgba(255,255,255,0.08)"
-              strokeWidth="16"
-              strokeLinecap="round"
-            />
-            {/* fill arc */}
-            <path
-              d="M 10 110 A 90 90 0 0 1 190 110"
-              fill="none"
-              stroke="url(#powerGrad)"
-              strokeWidth="16"
-              strokeLinecap="round"
-              strokeDasharray={`${(fillPct / 100) * 283} 283`}
-            />
-            <defs>
-              <linearGradient id="powerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#6366f1" />
-                <stop offset="100%" stopColor="#22d3ee" />
-              </linearGradient>
-            </defs>
-          </svg>
-          <div className="power-center-text">
-            <span className="power-total">{displayed.toFixed(0)}</span>
-            <span className="power-unit">W</span>
+    <Card>
+      <CardHeader>
+        <div className="flex items-end justify-between w-full">
+          <div>
+            <CardDescription>Right now</CardDescription>
+            <CardTitle>Total <span style={{ color: "var(--amber)", fontStyle: "italic" }}>load</span></CardTitle>
+          </div>
+          <span className="brand-tag" style={{ fontFamily: "var(--font-mono)" }}>live</span>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="card-content-fixed">
+          <div className="power-card">
+            <div className="power-headline">
+              <span className="power-num">
+                {intPart}
+                <span className="decimal">.{decPart}</span>
+              </span>
+              <span className="power-unit">watts</span>
+            </div>
+            <div className="power-rule" />
+            <div className="section-label" style={{ marginBottom: 12 }}>
+              <span>By room</span>
+              <span>W</span>
+            </div>
+            <div className="bars">
+              {ROOMS.map((r) => {
+                const w = perRoom[r];
+                const pct = (w / MAX_W) * 100;
+                return (
+                  <div className="bar-row" key={r}>
+                    <div className="bar-label">
+                      <span className="name">{ROOM_LABELS[r]}</span>
+                      <span className={`v ${w > 0 ? "amber" : ""}`}>{w.toFixed(0)}</span>
+                    </div>
+                    <div className="bar-track">
+                      <div
+                        className={`bar-fill ${w === 0 ? "zero" : ""}`}
+                        style={{ width: `${Math.max(2, pct)}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+              <div className="bar-row" style={{ marginTop: 6, paddingTop: 12, borderTop: "1px dashed var(--ink-4)" }}>
+                <div className="bar-label">
+                  <span className="name">Today, estimated</span>
+                  <span className="v">{kwh} kWh</span>
+                </div>
+                <div className="bar-track">
+                  <div className="bar-fill" style={{ width: `${Math.min(100, (Number(kwh) / 6) * 100)}%` }} />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <div className="power-stats">
-          <div className="power-stat">
-            <span className="stat-label">Est. Today</span>
-            <span className="stat-value">{kwhToday} kWh</span>
-          </div>
-          <div className="power-stat">
-            <span className="stat-label">Devices On</span>
-            <span className="stat-value">
-              {deviceList.filter((d) => d.status === "on").length}/18
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div className="bar-chart-wrap">
-        <ResponsiveContainer width="100%" height={140}>
-          <BarChart data={chartData} barCategoryGap="30%">
-            <XAxis
-              dataKey="name"
-              tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 12 }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis hide />
-            <Tooltip
-              cursor={{ fill: "rgba(255,255,255,0.04)" }}
-              contentStyle={{
-                background: "#1e1b4b",
-                border: "1px solid rgba(255,255,255,0.1)",
-                borderRadius: 8,
-                color: "#e0e7ff",
-              }}
-              formatter={(v) => [`${(v as number).toFixed(1)} W`, "Power"]}
-            />
-            <Bar dataKey="watts" radius={[6, 6, 0, 0]}>
-              {chartData.map((entry) => (
-                <Cell key={entry.room} fill={ROOM_COLORS[entry.room as RoomKey]} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-    </section>
+      </CardContent>
+    </Card>
   );
 }

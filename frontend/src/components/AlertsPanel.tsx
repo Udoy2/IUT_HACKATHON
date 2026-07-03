@@ -1,66 +1,71 @@
 import type { Alert } from "../types";
 import { ROOM_LABELS } from "../types";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "./ui/card";
+import { Alert as AlertBox, AlertDescription, AlertTitle } from "./ui/alert";
 
 interface Props {
   alerts: Alert[];
 }
 
 function formatTime(iso: string): string {
-  const d = new Date(iso);
-  // offset by +6 for display (matching backend assumption)
-  const local = new Date(d.getTime() + 6 * 60 * 60 * 1000);
-  return local.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  });
+  // Server stamps UTC; respect the +6 convention from the backend.
+  const d = new Date(new Date(iso).getTime() + 6 * 60 * 60 * 1000);
+  return d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
 }
 
 export function AlertsPanel({ alerts }: Props) {
   const active = alerts.filter((a) => a.active);
 
   return (
-    <section className="panel" id="alerts-panel">
-      <h2 className="panel-title">
-        <span className="panel-icon">🚨</span> Active Alerts
-        {active.length > 0 && (
-          <span className="alert-count-badge">{active.length}</span>
-        )}
-      </h2>
-
-      {active.length === 0 ? (
-        <div className="no-alerts">
-          <span className="no-alerts-icon">✅</span>
-          <p>All clear — no active alerts</p>
+    <Card>
+      <CardHeader>
+        <div className="flex items-end justify-between w-full">
+          <div>
+            <CardDescription>Alerts</CardDescription>
+            <CardTitle>Things that need <span style={{ color: "var(--rose)", fontStyle: "italic" }}>attention</span></CardTitle>
+          </div>
+          <span className="brand-tag" style={{ fontFamily: "var(--font-mono)", color: active.length > 0 ? "var(--rose)" : "var(--ink-3)", fontWeight: 600 }}>
+            {active.length} active
+          </span>
         </div>
-      ) : (
-        <ul className="alerts-list">
-          {active.map((alert) => (
-            <li
-              key={alert.id}
-              className={`alert-item alert-${alert.type}`}
-            >
-              <div className="alert-header">
-                <span className="alert-type-icon">
-                  {alert.type === "after_hours" ? "🌙" : "🔴"}
-                </span>
-                <span className="alert-type-label">
-                  {alert.type === "after_hours"
-                    ? "After Hours"
-                    : "Room Stuck On"}
-                </span>
-                {alert.room && (
-                  <span className="alert-room-tag">
-                    {ROOM_LABELS[alert.room as keyof typeof ROOM_LABELS] ?? alert.room}
-                  </span>
-                )}
-                <span className="alert-time">{formatTime(alert.triggered_at)}</span>
+      </CardHeader>
+      <CardContent>
+        <div className="card-content-fixed">
+          {active.length === 0 ? (
+            <AlertBox variant="success">
+              <span style={{ fontSize: 14 }}>●</span>
+              <div>
+                <AlertTitle>All circuits nominal</AlertTitle>
+                <AlertDescription>No active alerts — every room is within expected load.</AlertDescription>
               </div>
-              <p className="alert-message">{alert.message}</p>
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
+            </AlertBox>
+          ) : (
+            <div className="scrollable-list">
+              {active.slice(0, 12).map((a) => (
+                <AlertBox variant="alert" key={a.id}>
+                  <span style={{ color: "var(--rose)", fontWeight: 600, fontSize: 11, letterSpacing: "0.12em", minWidth: 26 }}>
+                    {a.type === "after_hours" ? "AH" : "RS"}
+                  </span>
+                  <div style={{ flex: 1 }}>
+                    <AlertTitle>
+                      {a.type === "after_hours" ? "After hours" : "Room stuck on"}
+                      {a.room && (
+                        <span style={{ color: "var(--ink-3)", fontWeight: 400, fontStyle: "normal", marginLeft: 8, fontFamily: "var(--font-sans)", fontSize: 12 }}>
+                          · {ROOM_LABELS[a.room as keyof typeof ROOM_LABELS]}
+                        </span>
+                      )}
+                    </AlertTitle>
+                    <AlertDescription>{a.message}</AlertDescription>
+                  </div>
+                  <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--ink-3)", whiteSpace: "nowrap" }}>
+                    {formatTime(a.triggered_at)}
+                  </span>
+                </AlertBox>
+              ))}
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
