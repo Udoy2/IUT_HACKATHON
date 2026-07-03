@@ -74,6 +74,46 @@ def humanize(prompt: str, fallback: str) -> str:
         return fallback
 
 
+def humanize_alert(prompt: str, alert_type: str, fallback: str) -> str:
+    if groq_client is None:
+        return fallback
+    try:
+        if alert_type == "after_hours":
+            system_msg = (
+                "You are a friendly office assistant bot. "
+                "Turn the raw after-hours alert into a warm, friendly, natural reminder/warning. "
+                "For example: 'Hey! Work Room 2 still has 2 fans and 3 lights ON and it's 10 PM. Did someone forget to leave?' "
+                "Keep it concise (1-2 sentences). Use emojis sparingly. Be charismatic."
+            )
+        elif alert_type == "room_stuck_on":
+            system_msg = (
+                "You are a friendly office assistant bot. "
+                "Turn the raw stuck-on alert into a gentle, helpful reminder. "
+                "Mention that devices in the room have been left ON for hours and ask if "
+                "someone forgot to turn them off. Keep it concise (1-2 sentences). Use emojis sparingly. Be charismatic."
+            )
+        else:
+            system_msg = (
+                "You are a friendly office assistant bot. "
+                "Turn the raw alert into a warm, natural, and friendly message. "
+                "Keep it concise (1-2 sentences). Be charismatic."
+            )
+
+        response = groq_client.chat.completions.create(
+            model="openai/gpt-oss-20b",
+            messages=[
+                {"role": "system", "content": system_msg},
+                {"role": "user", "content": prompt},
+            ],
+            max_tokens=400,
+            temperature=0.7,
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        log.warning("Groq alert error: %s — using plain-text fallback", e)
+        return fallback
+
+
 # ── REST helpers ──────────────────────────────────────────────────────────────
 
 async def _get(path: str):
@@ -260,13 +300,15 @@ async def proactive_alert_task():
             if a["id"] not in _seen_alert_ids:
                 _seen_alert_ids.add(a["id"])
                 icon = "⚠️" if a["type"] == "after_hours" else "🔴"
-                local_ts = datetime.fromisoformat(a["triggered_at"]).astimezone(
+                triggered_at = a["triggered_at"].replace("Z", "+00:00")
+                local_ts = datetime.fromisoformat(triggered_at).astimezone(
                     timezone(timedelta(hours=6))
                 )
                 ts_str = local_ts.strftime("%I:%M %p")
+                human_msg = humanize_alert(a["message"], a["type"], a["message"])
                 embed = discord.Embed(
                     title=f"{icon} Office Alert",
-                    description=a["message"],
+                    description=human_msg,
                     colour=discord.Colour.red(),
                 )
                 embed.set_footer(text=f"Triggered at {ts_str}")
