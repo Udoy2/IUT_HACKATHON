@@ -159,7 +159,7 @@ The system follows a **single-backend, two-client** architecture. Both the React
 |------|-------------|
 | **1** | **Simulator** flips a random device's `status` every 3–15 s and updates `last_changed`. It is the *only writer* of state. |
 | **2** | **DeviceStore** is one in-memory dict of 15 devices — nothing else holds a copy. |
-| **3** | **Alert Engine** reads DeviceStore every 30 s, checks two rules, and on a new trigger: logs it, pushes it over SSE, and optionally POSTs to a Discord webhook. |
+| **3** | **Alert Engine** reads DeviceStore every 10 s, checks two rules, and on a new trigger: logs it, pushes it over SSE, and optionally POSTs to a Discord webhook. |
 | **4** | **Dashboard** does one REST `GET` on load for initial state, then opens one `EventSource` connection and applies push updates — no polling, no manual refresh. |
 | **5** | **Discord Bot** is a separate process. Every command triggers a REST call to the backend, gets JSON back, and (optionally) passes it through Groq to produce a friendly sentence. |
 
@@ -193,7 +193,7 @@ Responses come from **real backend data** — never hardcoded. When a Groq API k
 
 ---
 
-## 🔧 Environment Variables
+## Environment Variables
 
 <details open>
 <summary><b>Bot <code>.env</code> Configuration</b></summary>
@@ -210,7 +210,7 @@ Responses come from **real backend data** — never hardcoded. When a Groq API k
 
 ---
 
-## ⚡ Alert Rules
+## Alert Rules
 
 The alert engine runs as an async background task, checking two rules every 30 seconds:
 
@@ -241,7 +241,7 @@ All endpoints return JSON. The SSE stream and REST API share **identical schemas
 
 ---
 
-### 📂 REST Endpoints
+### REST Endpoints
 
 <details>
 <summary>🟢 <b>GET</b> <code>/api/devices</code> — Retrieve status of all 15 simulated office devices</summary>
@@ -365,7 +365,7 @@ All endpoints return JSON. The SSE stream and REST API share **identical schemas
 
 ---
 
-### 📡 Real-time SSE Stream
+### Real-time SSE Stream
 
 <details>
 <summary>🔵 <b>GET</b> <code>/stream</code> — Server-Sent Events stream connection</summary>
