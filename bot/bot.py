@@ -60,12 +60,12 @@ def humanize(prompt: str, fallback: str) -> str:
                     "content": (
                         "You are a friendly office assistant bot. "
                         "Summarize the given raw device status data into one or two clear, "
-                        "friendly sentences. Keep it concise. Use emojis sparingly. Be charismatic and make jokes"
+                        "friendly sentences. Keep it concise. Use emojis sparingly. Be charismatic and make jokes and keep it short"
                     ),
                 },
                 {"role": "user", "content": prompt},
             ],
-            max_tokens=400,
+            max_tokens=300,
             temperature=0.7,
         )
         return response.choices[0].message.content.strip()
