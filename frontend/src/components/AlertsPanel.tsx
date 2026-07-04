@@ -2,6 +2,7 @@ import type { Alert } from "../types";
 import { ROOM_LABELS } from "../types";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "./ui/card";
 import { Alert as AlertBox, AlertDescription, AlertTitle } from "./ui/alert";
+import { Badge } from "./ui/badge";
 
 interface Props {
   alerts: Alert[];
@@ -22,18 +23,18 @@ export function AlertsPanel({ alerts }: Props) {
         <div className="flex items-end justify-between w-full">
           <div>
             <CardDescription>Alerts</CardDescription>
-            <CardTitle>Things that need <span style={{ color: "var(--rose)", fontStyle: "italic" }}>attention</span></CardTitle>
+            <CardTitle>Things that need <span className="text-rose italic">attention</span></CardTitle>
           </div>
-          <span className="brand-tag" style={{ fontFamily: "var(--font-mono)", color: active.length > 0 ? "var(--rose)" : "var(--ink-3)", fontWeight: 600 }}>
+          <Badge variant={active.length > 0 ? "live" : "neutral"}>
             {active.length} active
-          </span>
+          </Badge>
         </div>
       </CardHeader>
       <CardContent>
         <div className="card-content-fixed">
           {active.length === 0 ? (
             <AlertBox variant="success">
-              <span style={{ fontSize: 14 }}>●</span>
+              <span className="text-rose">●</span>
               <div>
                 <AlertTitle>All circuits nominal</AlertTitle>
                 <AlertDescription>No active alerts — every room is within expected load.</AlertDescription>
@@ -43,21 +44,23 @@ export function AlertsPanel({ alerts }: Props) {
             <div className="scrollable-list">
               {active.slice(0, 12).map((a) => (
                 <AlertBox variant="alert" key={a.id}>
-                  <span style={{ color: "var(--rose)", fontWeight: 600, fontSize: 11, letterSpacing: "0.12em", minWidth: 26 }}>
-                    {a.type === "after_hours" ? "" : ""}
-                  </span>
-                  <div style={{ flex: 1 }}>
-                    <AlertTitle>
-                      {a.type === "after_hours" ? "After hours" : "Room stuck on"}
-                      {a.room && (
-                        <span style={{ color: "var(--ink-3)", fontWeight: 400, fontStyle: "normal", marginLeft: 8, fontFamily: "var(--font-sans)", fontSize: 12 }}>
-                          · {ROOM_LABELS[a.room as keyof typeof ROOM_LABELS]}
-                        </span>
-                      )}
-                    </AlertTitle>
-                    <AlertDescription>{a.message}</AlertDescription>
+                  <div className="flex items-start gap-3">
+                    <span className="flex-shrink-0 text-rose font-medium text-[11px] tracking-[0.12em] min-w-[26px]">
+                      {a.type === "after_hours" ? "" : ""}
+                    </span>
+                    <div className="flex-1">
+                      <AlertTitle className="flex items-baseline gap-2">
+                        {a.type === "after_hours" ? "After hours" : "Room stuck on"}
+                        {a.room && (
+                          <span className="text-ink-3 font-normal whitespace-nowrap">
+                            · {ROOM_LABELS[a.room as keyof typeof ROOM_LABELS]}
+                          </span>
+                        )}
+                      </AlertTitle>
+                      <AlertDescription className="mt-1">{a.message}</AlertDescription>
+                    </div>
                   </div>
-                  <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--ink-3)", whiteSpace: "nowrap" }}>
+                  <span className="flex-shrink-0 text-ink-3 font-mono text-[10px] whitespace-nowrap">
                     {formatTime(a.triggered_at)}
                   </span>
                 </AlertBox>

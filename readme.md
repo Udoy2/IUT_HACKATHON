@@ -1,4 +1,4 @@
-# Office Watch 🏢
+# Office Watch 
 
 Real-time electrical monitoring for 18 simulated devices across 3 office rooms, with a live web dashboard and a Discord bot — both reading from one shared FastAPI backend.
 

@@ -29,9 +29,9 @@ export function PowerMeter({ devices }: Props) {
         <div className="flex items-end justify-between w-full">
           <div>
             <CardDescription>Right now</CardDescription>
-            <CardTitle>Total <span style={{ color: "var(--amber)", fontStyle: "italic" }}>load</span></CardTitle>
+            <CardTitle>Total <span className="text-amber italic">load</span></CardTitle>
           </div>
-          <span className="brand-tag" style={{ fontFamily: "var(--font-mono)" }}>live</span>
+          <span className="brand-tag font-mono">live</span>
         </div>
       </CardHeader>
       <CardContent>
@@ -45,7 +45,7 @@ export function PowerMeter({ devices }: Props) {
               <span className="power-unit">watts</span>
             </div>
             <div className="power-rule" />
-            <div className="section-label" style={{ marginBottom: 12 }}>
+            <div className="section-label pb-3">
               <span>By room</span>
               <span>W</span>
             </div>
@@ -57,7 +57,7 @@ export function PowerMeter({ devices }: Props) {
                   <div className="bar-row" key={r}>
                     <div className="bar-label">
                       <span className="name">{ROOM_LABELS[r]}</span>
-                      <span className={`v ${w > 0 ? "amber" : ""}`}>{w.toFixed(0)}</span>
+                      <span className={`v ${w > 0 ? "text-amber" : ""}`}>{w.toFixed(0)}</span>
                     </div>
                     <div className="bar-track">
                       <div
@@ -68,7 +68,7 @@ export function PowerMeter({ devices }: Props) {
                   </div>
                 );
               })}
-              <div className="bar-row" style={{ marginTop: 6, paddingTop: 12, borderTop: "1px dashed var(--ink-4)" }}>
+              <div className="bar-row mt-0.5 pt-3" style={{ borderTop: "1px dashed var(--ink-4)" }}>
                 <div className="bar-label">
                   <span className="name">Today, estimated</span>
                   <span className="v">{kwh} kWh</span>
