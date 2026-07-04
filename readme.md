@@ -67,6 +67,7 @@ office-watch/
 │   └── wokwi-project.txt     # Wokwi project configuration details
 │
 ├── diagrams/                 # Diagrams & visual assets
+│   ├── assets/               # assets used in readme.md
 │   ├── discord-bot-profile.jpg               # Discord bot profile image
 │   ├── image.png                             # Representative schematic image
 │   ├── office_watch_infographic (3) (1).png  # Main infographic with gradient background
@@ -87,6 +88,8 @@ office-watch/
 ## Quick Start
 
 Get Office Watch running locally in under 2 minutes. Each component starts independently.
+
+
 
 <details open>
 <summary><b>1. Backend</b></summary>
@@ -128,7 +131,7 @@ Dashboard live at **`http://localhost:5173`** — auto-proxies `/api` and `/stre
    ```bash
    cd bot
    pip install -r requirements.txt
-   cp .env.example .env
+   cp .env.example .env (or copy paste contents of the .env.example in a new .env file)
    ```
 
 4. **Set Up Env Variables** (`bot/.env`):
@@ -141,6 +144,15 @@ Dashboard live at **`http://localhost:5173`** — auto-proxies `/api` and `/stre
    python bot.py
    ```
 
+</details>
+
+<details open>
+<summary><b>⚠️ CAUTION ⚠️</b></summary>
+
+
+```bash
+If anything fails for the current setup above, then kindly setup Local Environments in the Backend and Bot directories then try again from start.
+```
 </details>
 
 ---
@@ -178,10 +190,12 @@ The system follows a **single-backend, two-client** architecture. Both the React
 
 | Command | Description | Example |
 |---------|-------------|---------|
-| `!ping` | 🟢 Health check | — |
-| `!status` | Full office summary (all 3 rooms) | `!status` |
-| `!room <name>` | Status of one room | `!room drawing`, `!room work1`, `!room work2` |
-| `!usage` | Total wattage + per-room breakdown + kWh estimate | `!usage` |
+| `!ping` | 🟢 Health check | ![alt text](diagrams/assets/mark-ping.png) |
+| `!status` | Full office summary (all 3 rooms) | ![alt text](diagrams/assets/mark-status.png) |
+| `!room draw` | Status of Drawing room | ![alt text](diagrams/assets/mark-draw.png) |
+| `!room wr1` | Status of work room 1| ![alt text](diagrams/assets/mark-wr1.png) |
+| `!room wr2` | Status of work room 2 | ![alt text](diagrams/assets/mark-wr2.png) |
+| `!usage` | Total wattage + per-room breakdown + kWh estimate | ![alt text](diagrams/assets/mark-usage.png) |
 
 **Room aliases:** `draw` → Drawing Room · `wr1` → Work Room 1 · `wr2` → Work Room 2
 
@@ -463,23 +477,10 @@ data: {"type": "alert", "data": {"id": "alert-0007", "type": "after_hours", ...}
 
 ---
 
-## Evaluation Criteria Coverage
-
-| Criterion | Weight | Satisfied By |
-|-----------|--------|-------------|
-| Working web dashboard, real-time | 20% | SSE push via `useDeviceStream` hook → React re-render |
-| Working Discord bot, real data | 10% | 4 commands, REST calls to backend, rich embeds |
-| Dashboard visuals / UX | 10% | Animated fans, glowing lights, power bars, office blueprint |
-| System diagram | 15% | `diagrams/system_diagram.md` + `diagrams/office_watch_infographic.png` |
-| Circuit schematic | 15% | `diagrams/` assets |
-| Dummy data quality | 15% | Realistic wattages, dynamic changes, alert engine with 2 rules |
-| Codebase / commits / docs | 15% | This README + incremental commit history |
-
----
 
 ## Schematics
-
-<p>
+Red LEDs are used to represent the fans and Green LEDs are used to represent the lights in the office.
+<p align="center">
     <img width="100%" src="Schematics/image.png" alt="Office Watch — Real-time Office Electrical Monitoring">
 </p>
 
