@@ -463,20 +463,6 @@ data: {"type": "alert", "data": {"id": "alert-0007", "type": "after_hours", ...}
 
 ---
 
-## Evaluation Criteria Coverage
-
-| Criterion | Weight | Satisfied By |
-|-----------|--------|-------------|
-| Working web dashboard, real-time | 20% | SSE push via `useDeviceStream` hook → React re-render |
-| Working Discord bot, real data | 10% | 4 commands, REST calls to backend, rich embeds |
-| Dashboard visuals / UX | 10% | Animated fans, glowing lights, power bars, office blueprint |
-| System diagram | 15% | `diagrams/system_diagram.md` + `diagrams/office_watch_infographic.png` |
-| Circuit schematic | 15% | `diagrams/` assets |
-| Dummy data quality | 15% | Realistic wattages, dynamic changes, alert engine with 2 rules |
-| Codebase / commits / docs | 15% | This README + incremental commit history |
-
----
-
 ## Schematics
 
 <p>
