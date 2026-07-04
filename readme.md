@@ -478,7 +478,7 @@ data: {"type": "alert", "data": {"id": "alert-0007", "type": "after_hours", ...}
 ---
 
 ## Schematics
-Red LEDs are used to represent the fans and Green LEDs are used to represent the lights in the office.
+Red LEDs are used to represent the fans and Green LEDs are used to represent the lights in the office. For live schematics demo: [**Link**](https://wokwi.com/projects/468605490535131137) 
 <p align="center">
     <img width="100%" src="Schematics/image.png" alt="Office Watch — Real-time Office Electrical Monitoring">
 </p>
