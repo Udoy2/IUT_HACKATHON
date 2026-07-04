@@ -477,7 +477,6 @@ data: {"type": "alert", "data": {"id": "alert-0007", "type": "after_hours", ...}
 
 ---
 
-
 ## Schematics
 Red LEDs are used to represent the fans and Green LEDs are used to represent the lights in the office.
 <p align="center">
